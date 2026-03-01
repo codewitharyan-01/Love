@@ -1,1 +1,1778 @@
-Working on it ...
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>प्यार की दास्तां | Aryan & Tulsi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #0a0608;
+            --bg-mid: #120c0e;
+            --bg-soft: #1a1214;
+            --fg: #f8f4f0;
+            --fg-muted: #c4b5a8;
+            --fg-dim: #8a7a6d;
+            --accent-gold: #d4a95a;
+            --accent-gold-light: #e8c97a;
+            --accent-gold-glow: rgba(212, 169, 90, 0.4);
+            --rose-deep: #6b2d3c;
+            --rose-mid: #8b3d4f;
+            --rose-light: #a85a6a;
+            --rose-glow: rgba(107, 45, 60, 0.5);
+            --card-bg: rgba(26, 18, 20, 0.85);
+            --border-subtle: rgba(212, 169, 90, 0.15);
+            --border-accent: rgba(212, 169, 90, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) var(--bg-deep);
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', 'Noto Sans Devanagari', serif;
+            background: var(--bg-deep);
+            color: var(--fg);
+            overflow-x: hidden;
+            line-height: 1.9;
+            font-weight: 400;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, var(--accent-gold), var(--rose-deep)); 
+            border-radius: 3px;
+        }
+
+        .font-display { font-family: 'Playfair Display', serif; }
+        .font-script { font-family: 'Great Vibes', cursive; }
+        .font-hindi { font-family: 'Noto Sans Devanagari', sans-serif; }
+        .font-body { font-family: 'Cormorant Garamond', serif; }
+
+        /* Noise Overlay */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Canvas Background */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Gradient Orbs */
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.5;
+            transition: transform 0.5s ease-out;
+        }
+
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-deep);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-heart {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .preloader-heart svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--accent-gold);
+            animation: heartbeat 1.2s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px var(--accent-gold-glow));
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(0.9); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(0.95); }
+            45% { transform: scale(1.1); }
+            60% { transform: scale(1); }
+        }
+
+        .preloader-text {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            letter-spacing: 0.4em;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            font-weight: 300;
+        }
+
+        .preloader-progress {
+            width: 200px;
+            height: 2px;
+            background: var(--bg-soft);
+            margin-top: 1.5rem;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .preloader-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--rose-deep), var(--accent-gold));
+            width: 0%;
+            animation: loadProgress 2s ease-out forwards;
+        }
+
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .hero-bg-layers {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+        }
+
+        .hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(107, 45, 60, 0.4) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 20% 80%, rgba(212, 169, 90, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 50% at 80% 60%, rgba(139, 61, 79, 0.2) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            letter-spacing: 0.5em;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.5s forwards;
+        }
+
+        .hero-names {
+            font-size: clamp(4.5rem, 18vw, 14rem);
+            line-height: 0.9;
+            color: transparent;
+            background: linear-gradient(135deg, var(--accent-gold-light) 0%, var(--accent-gold) 50%, var(--rose-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            filter: drop-shadow(0 0 60px var(--accent-gold-glow));
+            opacity: 0;
+            animation: fadeInScale 1.5s ease 0.8s forwards;
+        }
+
+        .hero-tagline {
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            color: var(--fg-muted);
+            margin-top: 2rem;
+            font-weight: 300;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.3s forwards;
+        }
+
+        .hero-date {
+            margin-top: 3rem;
+            padding: 1.2rem 3rem;
+            border: 1px solid var(--border-accent);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            display: inline-block;
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            color: var(--fg-muted);
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.6s forwards;
+        }
+
+        .scroll-cue {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--fg-dim);
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeInUp 1s ease 2s forwards;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(180deg, var(--accent-gold), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Story Section */
+        .story-section {
+            position: relative;
+            z-index: 10;
+            padding: 8rem 0;
+        }
+
+        .chapter {
+            max-width: 1000px;
+            margin: 0 auto 12rem;
+            padding: 0 2rem;
+            opacity: 0;
+            transform: translateY(80px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .chapter.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .chapter-number {
+            font-size: 0.75rem;
+            letter-spacing: 0.5em;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .chapter-number::before,
+        .chapter-number::after {
+            content: '';
+            width: 50px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold));
+        }
+
+        .chapter-number::after {
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+        }
+
+        .chapter-title {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            color: var(--fg);
+            font-weight: 600;
+            line-height: 1.3;
+            background: linear-gradient(135deg, var(--fg) 30%, var(--accent-gold-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .chapter-content {
+            font-size: 1.25rem;
+            color: var(--fg-muted);
+            line-height: 2.2;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .chapter-content p {
+            margin-bottom: 2rem;
+        }
+
+        .chapter-content p:first-of-type::first-letter {
+            font-size: 4.5rem;
+            float: left;
+            line-height: 0.8;
+            margin-right: 1rem;
+            margin-top: 0.2rem;
+            color: var(--accent-gold);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        /* Poetry Card */
+        .poetry-card {
+            position: relative;
+            margin: 4rem 0;
+            padding: 3rem;
+            background: linear-gradient(135deg, rgba(107, 45, 60, 0.3) 0%, rgba(26, 18, 20, 0.6) 100%);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 0 20px 20px 0;
+            overflow: hidden;
+        }
+
+        .poetry-card::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 12rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            opacity: 0.1;
+            line-height: 1;
+        }
+
+        .poetry-text {
+            position: relative;
+            z-index: 2;
+            font-size: 1.4rem;
+            line-height: 2.4;
+            color: var(--fg);
+            font-style: italic;
+            text-align: center;
+        }
+
+        .poetry-decoration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            color: var(--accent-gold);
+        }
+
+        .poetry-decoration svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            opacity: 0.6;
+        }
+
+        .poetry-decoration span {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        /* Divider */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .divider-line {
+            flex: 1;
+            max-width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-accent), transparent);
+        }
+
+        .divider-icon {
+            margin: 0 2rem;
+            color: var(--accent-gold);
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        .divider-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+            filter: drop-shadow(0 0 15px var(--accent-gold-glow));
+        }
+
+        /* Timeline */
+        .timeline-section {
+            position: relative;
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, transparent 0%, rgba(107, 45, 60, 0.1) 50%, transparent 100%);
+        }
+
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        .timeline-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--accent-gold), var(--rose-deep), var(--accent-gold), transparent);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-card {
+            margin-right: calc(50% + 60px);
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) .timeline-card {
+            margin-left: calc(50% + 60px);
+            text-align: left;
+        }
+
+        .timeline-card {
+            max-width: 450px;
+            padding: 2.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 0 6px var(--bg-deep), 0 0 30px var(--accent-gold-glow);
+            z-index: 5;
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.6rem;
+            color: var(--fg);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .timeline-desc {
+            font-size: 1.05rem;
+            color: var(--fg-muted);
+            line-height: 1.7;
+        }
+
+        /* Counter Section */
+        .counter-section {
+            padding: 8rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .counter-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(107, 45, 60, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .counter-title {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            color: var(--fg);
+            margin-bottom: 4rem;
+            font-weight: 600;
+        }
+
+        .counter-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .counter-card {
+            min-width: 200px;
+            padding: 3rem 2rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            transition: all 0.4s ease;
+        }
+
+        .counter-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .counter-number {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .counter-label {
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+        }
+
+        /* Promises Section */
+        .promises-section {
+            padding: 8rem 2rem;
+            background: linear-gradient(180deg, 
+                transparent 0%, 
+                rgba(212, 169, 90, 0.05) 25%,
+                rgba(107, 45, 60, 0.1) 75%,
+                transparent 100%);
+        }
+
+        .promises-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .promises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .promise-card {
+            padding: 3rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+        }
+
+        .promise-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .promise-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-10px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3), 0 0 60px var(--rose-glow);
+        }
+
+        .promise-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--rose-deep), var(--rose-mid));
+            border-radius: 50%;
+            box-shadow: 0 10px 30px var(--rose-glow);
+        }
+
+        .promise-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-gold-light);
+        }
+
+        .promise-title {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .promise-text {
+            font-size: 1.1rem;
+            color: var(--fg-muted);
+            line-height: 1.8;
+        }
+
+        /* Letter Section */
+        .letter-section {
+            padding: 10rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .letter-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(212, 169, 90, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(107, 45, 60, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .letter-container {
+            max-width: 900px;
+            margin: 0 auto;
+            perspective: 1500px;
+        }
+
+        .letter-paper {
+            padding: 5rem;
+            background: linear-gradient(145deg, #faf6f0 0%, #f0e8dc 50%, #e8ddd0 100%);
+            color: #2d2420;
+            position: relative;
+            border-radius: 4px;
+            box-shadow: 
+                0 60px 120px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(0, 0, 0, 0.05),
+                inset 0 0 100px rgba(212, 169, 90, 0.1);
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+        }
+
+        .letter-paper:hover {
+            transform: rotateX(2deg) rotateY(-2deg);
+        }
+
+        .letter-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(180deg, rgba(212, 169, 90, 0.15), transparent);
+            pointer-events: none;
+        }
+
+        .letter-paper::after {
+            content: '';
+            position: absolute;
+            inset: 20px;
+            border: 1px solid rgba(212, 169, 90, 0.2);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        .letter-fold {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 80px solid transparent;
+            border-right: 80px solid transparent;
+            border-top: 60px solid #e8ddd0;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .letter-greeting {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: var(--rose-deep);
+            margin-bottom: 2.5rem;
+            text-align: left;
+        }
+
+        .letter-body {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.35rem;
+            line-height: 2.3;
+            color: #3d3028;
+            text-align: justify;
+        }
+
+        .letter-body p {
+            margin-bottom: 1.8rem;
+            text-indent: 2rem;
+        }
+
+        .letter-signature {
+            margin-top: 3.5rem;
+            text-align: right;
+            font-family: 'Great Vibes', cursive;
+            font-size: 3rem;
+            color: var(--rose-deep);
+        }
+
+        .letter-wax {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, var(--rose-light), var(--rose-deep));
+            border-radius: 50%;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter-wax svg {
+            width: 30px;
+            height: 30px;
+            fill: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, transparent, var(--bg-mid));
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-names {
+            font-size: clamp(4rem, 12vw, 8rem);
+            color: transparent;
+            background: linear-gradient(135deg, var(--accent-gold-light), var(--rose-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 40px var(--accent-gold-glow));
+        }
+
+        .footer-message {
+            font-size: 1.3rem;
+            color: var(--fg-muted);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            line-height: 2;
+        }
+
+        .footer-heart {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        .footer-heart svg {
+            width: 50px;
+            height: 50px;
+            fill: var(--rose-mid);
+            filter: drop-shadow(0 0 20px var(--rose-glow));
+        }
+
+        .footer-copyright {
+            margin-top: 3rem;
+            font-size: 0.85rem;
+            color: var(--fg-dim);
+            letter-spacing: 0.1em;
+        }
+
+        /* Music Player */
+        .music-player {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(26, 18, 20, 0.9);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .music-player:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-3px);
+        }
+
+        .music-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--rose-deep), var(--rose-mid));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--rose-glow);
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px var(--rose-glow);
+        }
+
+        .music-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--accent-gold-light);
+        }
+
+        .visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 35px;
+            padding: 0 0.5rem;
+        }
+
+        .visualizer-bar {
+            width: 4px;
+            background: linear-gradient(180deg, var(--accent-gold), var(--rose-light));
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .music-info {
+            display: flex;
+            flex-direction: column;
+            padding-right: 0.5rem;
+        }
+
+        .music-title {
+            font-size: 0.95rem;
+            color: var(--fg);
+            font-weight: 500;
+        }
+
+        .music-artist {
+            font-size: 0.75rem;
+            color: var(--fg-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Progress Ring */
+        .progress-ring {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-ring.visible {
+            opacity: 1;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 3;
+        }
+
+        .progress-ring .bg {
+            stroke: var(--bg-soft);
+        }
+
+        .progress-ring .progress {
+            stroke: var(--accent-gold);
+            stroke-dasharray: 138.23;
+            stroke-dashoffset: 138.23;
+            transition: stroke-dashoffset 0.1s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .timeline-line {
+                left: 30px;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-card,
+            .timeline-item:nth-child(even) .timeline-card {
+                margin-left: 80px;
+                margin-right: 0;
+                text-align: left;
+            }
+
+            .timeline-dot {
+                left: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-names {
+                font-size: 3.5rem;
+            }
+
+            .chapter {
+                padding: 0 1.5rem;
+            }
+
+            .chapter-content p:first-of-type::first-letter {
+                font-size: 3rem;
+            }
+
+            .letter-paper {
+                padding: 3rem 2rem;
+            }
+
+            .letter-greeting {
+                font-size: 2.5rem;
+            }
+
+            .letter-body {
+                font-size: 1.1rem;
+            }
+
+            .music-player {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                padding: 0.75rem 1rem;
+            }
+
+            .music-info {
+                display: none;
+            }
+
+            .counter-grid {
+                gap: 1.5rem;
+            }
+
+            .counter-card {
+                min-width: 140px;
+                padding: 2rem 1.5rem;
+            }
+
+            .counter-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .preloader-progress-bar {
+                animation: none;
+                width: 100%;
+            }
+        }
+
+        /* Focus States */
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 4px;
+        }
+
+        /* Selection */
+        ::selection {
+            background: var(--rose-deep);
+            color: var(--fg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Gradient Orbs -->
+    <div class="gradient-orb" id="orb1" style="width: 600px; height: 600px; background: radial-gradient(circle, var(--rose-deep) 0%, transparent 70%); top: -10%; left: -10%;"></div>
+    <div class="gradient-orb" id="orb2" style="width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%); top: 50%; right: -10%; opacity: 0.3;"></div>
+    <div class="gradient-orb" id="orb3" style="width: 400px; height: 400px; background: radial-gradient(circle, var(--rose-mid) 0%, transparent 70%); bottom: 10%; left: 20%; opacity: 0.25;"></div>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-heart">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        </div>
+        <p class="preloader-text font-hindi">प्यार लोड हो रहा है</p>
+        <div class="preloader-progress">
+            <div class="preloader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Progress Ring -->
+    <div class="progress-ring" id="progressRing">
+        <svg width="50" height="50">
+            <circle class="bg" cx="25" cy="25" r="22"/>
+            <circle class="progress" id="progressCircle" cx="25" cy="25" r="22"/>
+        </svg>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-bg-layers">
+            <div class="hero-gradient"></div>
+        </div>
+        <div class="hero-content">
+            <p class="hero-subtitle font-hindi">प्यार की दास्तां</p>
+            <h1 class="hero-names font-script">Aryan & Tulsi</h1>
+            <p class="hero-tagline font-hindi">एक कहानी जो दूरी से शुरू हुई और प्यार में बदल गई</p>
+            <div class="hero-date font-hindi">
+                दो दिल, दो देश, एक अनमोल रिश्ता
+            </div>
+        </div>
+        <div class="scroll-cue font-hindi">
+            <span>नीचे स्क्रॉल करें</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Story Section -->
+    <main class="story-section" id="story">
+        
+        <!-- Chapter 1 -->
+        <article class="chapter" data-chapter="1">
+            <div class="chapter-header">
+                <div class="chapter-number font-display">अध्याय एक</div>
+                <h2 class="chapter-title font-display">बेचैन दिल की आवाज़</h2>
+            </div>
+            <div class="chapter-content font-hindi">
+                <p>कुछ कहानियाँ तय्यार होकर नहीं लिखी जातीं, बस लिखने वाला मिल जाता है। यह कहानी भी ऐसी ही है — दो दिलों की, दो देशों की, और एक ऐसे प्यार की जो हज़ारों मील की दूरी को भी महसूस नहीं होने देता।</p>
+                <p>मेरा नाम आर्यन है। चौबीस साल का यह दिल, जो अक्टूबर की चार तारीख को धड़कना शुरू हुआ था, आज उसी दिल में एक और धड़कन बस गई है — तुलसी। नाम सुनकर ही अजीब सा लगा — तुलसी, जो पवित्रता का प्रतीक है, जो हर घर में पूजी जाती है, जो शुद्धता का नाम है।</p>
+                <p>क्या पता था मुझे कि इस नाम का मतलब एक दिन मेरी ज़िंदगी बन जाएगा? क्या पता था कि यह नाम मेरी ज़ुबान पर ऐसे आएगा जैसे कोई प्रार्थना हो? क्या पता था कि इस नाम को लेकर मैं रातों को जागूँगा, दिन भर सोचूँगा, और हर पल इसी का ख्याल रखूँगा?</p>
+            </div>
+            <div class="poetry-card">
+                <p class="poetry-text">
+                    दिल की धड़कनों को कौन समझाए,<br>
+                    ये तो बस उसी के नाम पे थम जाती है।<br>
+                    दूर होकर भी जो पास हो,<br>
+                    वो मोहब्बत असली कहलाती है।
+                </p>
+                <div class="poetry-decoration">
+                    <span></span>
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span></span>
+                </div>
+            </div>
+        </article>
+
+        <!-- Chapter 2 -->
+        <article class="chapter" data-chapter="2">
+            <div class="chapter-header">
+                <div class="chapter-number font-display">अध्याय दो</div>
+                <h2 class="chapter-title font-display">जब घर में शादी की बातें शुरू हुईं</h2>
+            </div>
+            <div class="chapter-content font-hindi">
+                <p>करीब आठ महीने पहले की बात है। घर में शादी की चर्चाएं जोरों पर थीं। पापा, मम्मी, दादा-दादी — सब एक सवाल पूछ रहे थे: "आर्यन की शादी कब होगी?" हर शाम यही सवाल, हर दिन यही बहस।</p>
+                <p>वो शामें बड़ी बेचैन करने वाली थीं। बालकनी में खड़े होकर सोचता था — मुझे कैसी लड़की मिलेगी? वो कैसी होगी? क्या वो मुझे समझ पाएगी? क्या वो मेरे ख्यालों जैसी होगी? या फिर कुछ और ही होगी?</p>
+                <p>मैंने कभी कल्पना नहीं की थी कि मेरी ज़िंदगी में कोई ऐसी आएगी जो सिर्फ सुंदर हो, बल्कि वो जो मेरी आत्मा से जुड़े। मुझे ऐसी लड़की चाहिए थी जो अनंतकाल तक प्रेम करे, जो राजा-रानी जैसा प्यार दे। जैसे कृष्ण भगवान थे — झगड़ा हो फिर मना लें, बिगड़े फिर संवर जाएं। मुझे ऐसी लड़की चाहिए थी जो मुझसे मैच्योर हो, मेरा ख्याल रखे, मेरे मम्मी-पापा को अपना समझे।</p>
+            </div>
+            <div class="poetry-card">
+                <p class="poetry-text">
+                    मोहब्बत में शर्तें नहीं होती,<br>
+                    बस एक दिल होता है जो धड़कता है।<br>
+                    जो मिल जाए वो हीरो नहीं होता,<br>
+                    जो समझ जाए वो असली होता है।
+                </p>
+                <div class="poetry-decoration">
+                    <span></span>
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span></span>
+                </div>
+            </div>
+        </article>
+
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <div class="divider-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Chapter 3 -->
+        <article class="chapter" data-chapter="3">
+            <div class="chapter-header">
+                <div class="chapter-number font-display">अध्याय तीन</div>
+                <h2 class="chapter-title font-display">वो शनिवार जिसने सब बदल दिया</h2>
+            </div>
+            <div class="chapter-content font-hindi">
+                <p>गर्मियों के वो दिन थे। छुट्टियों का मज़ा, टेरेस पर सोने की आदत, रात भर मोबाइल पर रील्स देखना और फिर नींद का गहरा समंदर — यही था मेरा रुटीन। लेकिन उस शनिवार ने सब कुछ बदल दिया।</p>
+                <p>पापा की आवाज़ आई — "आर्यन! जल्दी आओ!" वो खाना खा रहे थे और मुझे बुला रहे थे। "तेरा बायोडाटा तेरे पास है?" उन्होंने पूछा। मेरे पास था, लेकिन अपडेट नहीं था। मैंने कहा — "हाँ है, लेकिन अपडेट नहीं किया है।"</p>
+                <p>तब पता चला कि मफतलाल जी — जो तुलसी के बड़े पापा हैं — उन्होंने मेरा बायोडाटा माँगा था। मुझे गुस्सा आया, नींद टूटी थी, लेकिन फिर सोचा — यह तो पूरी ज़िंदगी का सवाल है। मैंने फटाफट बायोडाटा बनवाया। तीन-चार सौ रुपये लगे, लेकिन बन गया। भेज दिया। लेकिन जवाब नहीं आया।</p>
+                <p>कुछ दिन बाद फिर माँगा गया। फिर भेजा। फिर तीसरी बार — और तब पता चला, उन्हें फार्मेसी वाला लड़का चाहिए था। यूके में सेटल। मेरा दिल थोड़ा टूटा, लेकिन मैंने कबूल कर लिया। शायद यह लिखा नहीं था। लेकिन ज़िंदगी के ताने-बाने कुछ ऐसे होते हैं — जब हम हार मान लेते हैं, तभी कोई नई शुरुआत होती है।</p>
+            </div>
+            <div class="poetry-card">
+                <p class="poetry-text">
+                    तकदीर के ताने-बाने में,<br>
+                    कुछ धागे उलझे होते हैं।<br>
+                    जो लगता है खोया हुआ,<br>
+                    वो कहीं मिला होता है।
+                </p>
+                <div class="poetry-decoration">
+                    <span></span>
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span></span>
+                </div>
+            </div>
+        </article>
+
+        <!-- Chapter 4 -->
+        <article class="chapter" data-chapter="4">
+            <div class="chapter-header">
+                <div class="chapter-number font-display">अध्याय चार</div>
+                <h2 class="chapter-title font-display">रात के दो बजे — एक मैसेज जिसने सब बदल दिया</h2>
+            </div>
+            <div class="chapter-content font-hindi">
+                <p>वो रात याद है मुझे। गर्मी की रात, टेरेस पर बैठा था, तारे गिन रहा था। अचानक एक ख्याल आया — उस बायोडाटा में जो लड़की थी, वो कौन है? कैसी है? कहाँ है? और वो इतनी दूर... लंदन में... क्या वो कभी मिल पाएगी?</p>
+                <p>मैंने इंस्टाग्राम खोला। तुलसी रमेश भाई पटेल। नाम सुनकर ही अजीब सा लगा। सर्च किया। बर्थडे डाली। और... वो मिल गई। दो बजे रात के, मैंने मैसेज किया — "आप तुलसी हो?"</p>
+                <p>जवाब आया — "हाँ, आप कौन?" मैंने सब बताया। बायोडाटा की पूरी कहानी। तीन हफ्ते का इंतज़ार। और फिर वो अस्वीकृति। मैं नींद में था, लेकिन उस रात नींद नहीं आई। वो जवाब दे रही थी, और मुझे अजीब सी शांति मिल रही थी। जैसे कुछ अधूरा पूरा हो रहा हो। जैसे कोई दरवाज़ा खुल रहा हो।</p>
+            </div>
+            <div class="poetry-card">
+                <p class="poetry-text">
+                    रात के सन्नाटे में जब सब सोते हैं,<br>
+                    दो दिल जागते हैं किसी और को सोचते हैं।<br>
+                    कुछ मुलाकातें अनकही होती हैं,<br>
+                    जो ज़िंदगी को हमेशा के लिए बदल देती हैं।
+                </p>
+                <div class="poetry-decoration">
+                    <span></span>
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span></span>
+                </div>
+            </div>
+        </article>
+
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <div class="divider-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Chapter 5 -->
+        <article class="chapter" data-chapter="5">
+            <div class="chapter-header">
+                <div class="chapter-number font-display">अध्याय पाँच</div>
+                <h2 class="chapter-title font-display">दो तारीख — जब हम एक हो गए</h2>
+            </div>
+            <div class="chapter-content font-hindi">
+                <p>फिर एक दिन — शायद तीस तारीख के आस-पास — एक रिक्वेस्ट आई। तुलसी ने मुझे फॉलो किया। मैंने भी किया। मैं सोचता रहा — क्या मैं उसे पसंद आऊंगा? क्या वो मुझे देखकर निराश होगी? और फिर उस दिन मैंने कह दिया — "अगर कुछ नहीं हुआ हमारा, तो हम सिर्फ दोस्त रहेंगे।" आज भी उसे यह बात याद है।</p>
+                <p>और फिर वो दिन आया। दो तारीख। मैंने प्रपोज़ किया। और उसने कबूल किया। उस दिन की याद में आज भी मेरी आँखें नम हो जाती हैं। यह कोई अरेंज मैरेज नहीं था। यह हमारा लव मैरेज था — जो हमने खुद तय किया, खुद चुना, और खुद सँभाला।</p>
+                <p>हम एक दूसरे को नहीं मिले हैं। वो लंदन में है, मैं यहाँ। उसकी उम्र मुझसे बड़ी है, लेकिन प्यार को उम्र से क्या लेना? हम एक दूसरे को इतना चाहते हैं कि शब्द कम पड़ जाते हैं। मैं हर रोज़ सुबह उठता हूँ, फोन उठाता हूँ, और पहला मैसेज उसी को भेजता हूँ — "गुड मॉर्निंग।" रात को सोने से पहले — "गुड नाइट।" कभी-कभी पूरी रात जागता हूँ, बस उससे बात करता हूँ।</p>
+            </div>
+            <div class="poetry-card">
+                <p class="poetry-text">
+                    मोहब्बत में रिश्ते खुद बनते हैं,<br>
+                    दिल की धड़कनों से तय होते हैं।<br>
+                    जो लिखा नहीं किताबों में,<br>
+                    वो रिश्ते खास होते हैं।
+                </p>
+                <div class="poetry-decoration">
+                    <span></span>
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span></span>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <!-- Timeline Section -->
+    <section class="timeline-section" id="timeline">
+        <div class="chapter-header" style="text-align: center; margin-bottom: 1rem;">
+            <div class="chapter-number font-display">हमारा सफ़र</div>
+            <h2 class="chapter-title font-display">महत्वपूर्ण पल</h2>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <div class="timeline-date font-display">8 महीने पहले</div>
+                    <h3 class="timeline-title font-display">पहली बार बायोडाटा भेजा</h3>
+                    <p class="timeline-desc font-hindi">जब पापा ने बुलाया और कहा — तेरा बायोडाटा माँगा गया है। उस दिन मैंने सोचा था यह एक आम बात है, लेकिन पता नहीं था कि यह मेरी ज़िंदगी बदलने वाली है।</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <div class="timeline-date font-display">उसी रात</div>
+                    <h3 class="timeline-title font-display">इंस्टाग्राम पर मैसेज</h3>
+                    <p class="timeline-desc font-hindi">रात के दो बजे, तुलसी को पहला मैसेज — "आप तुलसी हो?" वो रात मैं कभी नहीं भूल सकता। जब उसका जवाब आया, मेरा दिल ज़ोर से धड़का।</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <div class="timeline-date font-display">तीस तारीख</div>
+                    <h3 class="timeline-title font-display">फॉलो बैक</h3>
+                    <p class="timeline-desc font-hindi">जब तुलसी ने फॉलो किया और बातें शुरू हुईं। उस दिन से अब तक, हर दिन बात होती है। हर रात सोने से पहले एक दूसरे को गुड नाइट कहते हैं।</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <div class="timeline-date font-display">दो तारीख</div>
+                    <h3 class="timeline-title font-display">रिलेशनशिप की शुरुआत</h3>
+                    <p class="timeline-desc font-hindi">जब मैंने प्रपोज़ किया और उसने हाँ कह दी। वो दिन मेरी ज़िंदगी का सबसे खूबसूरत दिन है। जब उसने "हाँ" कहा, मैं रोया था — खुशी के आँसू।</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <div class="timeline-date font-display">आज</div>
+                    <h3 class="timeline-title font-display">8 महीने बाद</h3>
+                    <p class="timeline-desc font-hindi">अभी तक नहीं मिले, लेकिन दिल से साथ हैं। हर दिन इंतज़ार बढ़ता है, और हर दिन प्यार भी गहरा होता है। जल्द मिलेंगे, यह वादा है।</p>
+                </div>
+                <div class="timeline-dot"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Counter Section -->
+    <section class="counter-section">
+        <div class="chapter-header" style="text-align: center; margin-bottom: 1rem;">
+            <div class="chapter-number font-display">प्यार का हिसाब</div>
+        </div>
+        <h2 class="counter-title font-display">दिल से दिल तक</h2>
+        
+        <div class="counter-grid">
+            <div class="counter-card">
+                <div class="counter-number" data-target="273">0</div>
+                <div class="counter-label font-hindi">दिन साथ</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number">1000+</div>
+                <div class="counter-label font-hindi">कॉल्स</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number">&infin;</div>
+                <div class="counter-label font-hindi">मैसेजेज</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number">&infin;</div>
+                <div class="counter-label font-hindi">प्यार</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promises Section -->
+    <section class="promises-section" id="promises">
+        <div class="promises-header">
+            <div class="chapter-number font-display" style="display: flex; justify-content: center;">वादे</div>
+            <h2 class="chapter-title font-display">मेरे वादे तुमसे</h2>
+        </div>
+        
+        <div class="promises-grid">
+            <div class="promise-card">
+                <div class="promise-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <h3 class="promise-title font-display">हमेशा साथ</h3>
+                <p class="promise-text font-hindi">मैं हमेशा तुम्हारे साथ रहूँगा, चाहे कोई भी मुश्किल आए। ज़िंदगी की हर राह में, हर मोड़ पर, मैं तुम्हारे साथ खड़ा रहूँगा।</p>
+            </div>
+
+            <div class="promise-card">
+                <div class="promise-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <h3 class="promise-title font-display">सपोर्ट</h3>
+                <p class="promise-text font-hindi">तुम्हारी हर परेशानी में साथ दूँगा, हर फैसले में साथ खड़ा रहूँगा। तुम्हारे सपनों को मेरे सपने बनाऊँगा।</p>
+            </div>
+
+            <div class="promise-card">
+                <div class="promise-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                </div>
+                <h3 class="promise-title font-display">सम्मान</h3>
+                <p class="promise-text font-hindi">तुम्हारे मम्मी-पापा का ख्याल रखूँगा, उनका सम्मान करूँगा। तुम्हारा परिवार मेरा परिवार होगा।</p>
+            </div>
+
+            <div class="promise-card">
+                <div class="promise-icon">
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                </div>
+                <h3 class="promise-title font-display">खुशियाँ</h3>
+                <p class="promise-text font-hindi">तुम्हें हर दिन खुश रखने की कोशिश करूँगा, हर ज़रूरत पूरी करूँगा। तुम्हारी हर मुस्कान मेरी ज़िंदगी का मकसद होगी।</p>
+            </div>
+
+            <div class="promise-card">
+                <div class="promise-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+                </div>
+                <h3 class="promise-title font-display">पहचान</h3>
+                <p class="promise-text font-hindi">तुम्हें कभी बदलने नहीं दूँगा, तुम जैसी हो वैसी ही रहोगी। तुम्हारी हर आदत, हर बात — सब मुझे प्यारी है।</p>
+            </div>
+
+            <div class="promise-card">
+                <div class="promise-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                </div>
+                <h3 class="promise-title font-display">सुरक्षा</h3>
+                <p class="promise-text font-hindi">तुम्हें किसी भी नुकसान से बचाऊँगा, हमेशा ढाल बनकर खड़ा रहूँगा। तुम्हारी हर चिंता मेरी चिंता होगी।</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Letter Section -->
+    <section class="letter-section" id="letter">
+        <div class="chapter-header" style="text-align: center; margin-bottom: 4rem;">
+            <div class="chapter-number font-display">एक ख़त</div>
+            <h2 class="chapter-title font-display">तुम्हारे लिए</h2>
+        </div>
+        
+        <div class="letter-container">
+            <div class="letter-paper">
+                <div class="letter-fold"></div>
+                <div class="letter-greeting">प्यारी तुलसी,</div>
+                <div class="letter-body font-hindi">
+                    <p>आज जब मैं यह ख़त लिख रहा हूँ, तो मेरी उँगलियाँ थोड़ी काँप रही हैं। शायद इसलिए क्योंकि मैंने कभी सोचा नहीं था कि कोई मेरे दिल में इतनी गहराई से उतर आएगी।</p>
+                    
+                    <p>तुम जब पहली बार मिली — नहीं, हम अभी तक नहीं मिले — लेकिन जब पहली बार बात हुई, तो मुझे लगा था कि यह कोई आम बातचीत है। लेकिन पता नहीं कब, कैसे, और क्यों — तुम मेरी ज़िंदगी का हिस्सा बन गई।</p>
+                    
+                    <p>तुमने मुझे वो प्यार दिया जो मैंने कभी नहीं जाना था। तुमने मेरे दिल को ठिकाना दिया। तुमने मुझे यह एहसास दिलाया कि प्यार में उम्र नहीं देखी जाती, दूरी नहीं देखी जाती — बस दिल देखा जाता है।</p>
+                    
+                    <p>मैं जानता हूँ कि मैं परफेक्ट नहीं हूँ। मेरी कमियाँ हैं, मेरी गल्तियाँ हैं। लेकिन तुम्हारे लिए, मैं बेहतर बनना चाहता हूँ। हर दिन, थोड़ा सा, तुम्हारे लिए।</p>
+                    
+                    <p>मैं इंतज़ार कर रहा हूँ उस दिन का जब हम पहली बार मिलेंगे। जब मैं तुम्हें अपनी बाँहों में भर लूँगा। जब तुम्हारे गाल को छू पाऊँगा। जब तुम्हारी आँखों में देखकर कह पाऊँगा — "मैं तुमसे प्यार करता हूँ।"</p>
+                    
+                    <p>तब तक, यह ख़त मेरी तरफ से एक छोटी सी कोशिश है — तुम्हें बताने की कि तुम मेरे लिए कितनी खास हो।</p>
+                </div>
+                <div class="letter-signature">तुम्हारा आर्यन</div>
+                <div class="letter-wax">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <h2 class="footer-names font-script">Aryan & Tulsi</h2>
+        <p class="footer-message font-hindi">
+            यह कहानी यहाँ खत्म नहीं होती। यह तो बस शुरुआत है।<br>
+            हमारी शादी होगी, हमारे बच्चे होंगे,<br>
+            और हम बूढ़े होकर भी एक दूसरे का हाथ नहीं छोड़ेंगे।
+        </p>
+        <div class="footer-heart">
+            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <p class="footer-copyright font-hindi">हमेशा के लिए — यही वो वादा है।</p>
+    </footer>
+
+    <!-- Music Player -->
+    <div class="music-player" id="musicPlayer">
+        <button class="music-btn" id="playBtn" aria-label="Play or pause music">
+            <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="visualizer" id="visualizer">
+            <div class="visualizer-bar" style="height: 8px;"></div>
+            <div class="visualizer-bar" style="height: 15px;"></div>
+            <div class="visualizer-bar" style="height: 10px;"></div>
+            <div class="visualizer-bar" style="height: 20px;"></div>
+            <div class="visualizer-bar" style="height: 12px;"></div>
+        </div>
+        <div class="music-info">
+            <span class="music-title font-hindi">रोमांटिक गाना</span>
+            <span class="music-artist font-hindi">आर्यन और तुलसी के लिए</span>
+        </div>
+    </div>
+
+
+
+
+
+<audio id="bgMusic" loop preload="auto">
+    <source src="love.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+window.onload = function () {
+    let music = document.getElementById("bgMusic");
+
+    music.currentTime = 30; // start from 30 sec
+    music.volume = 0.5;
+
+    // try autoplay
+    music.play().catch(() => {
+        // if blocked by browser
+        document.addEventListener("click", () => {
+            music.currentTime = 30;
+            music.play();
+        }, { once: true });
+    });
+};
+</script>
+
+
+  
+
+    <script>
+        // ===== INITIALIZATION =====
+        const preloader = document.getElementById('preloader');
+        const particleCanvas = document.getElementById('particleCanvas');
+        const ctx = particleCanvas.getContext('2d');
+        const progressRing = document.getElementById('progressRing');
+        const progressCircle = document.getElementById('progressCircle');
+        const chapters = document.querySelectorAll('.chapter');
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        const promiseCards = document.querySelectorAll('.promise-card');
+        const playBtn = document.getElementById('playBtn');
+        const bgMusic = document.getElementById('bgMusic');
+        const visualizer = document.getElementById('visualizer');
+        const playIcon = document.getElementById('playIcon');
+        const orb1 = document.getElementById('orb1');
+        const orb2 = document.getElementById('orb2');
+        const orb3 = document.getElementById('orb3');
+        
+        let isPlaying = false;
+        let visualizerInterval = null;
+        let particles = [];
+        let animationId = null;
+        let mouseX = 0;
+        let mouseY = 0;
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // ===== PRELOADER =====
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+                if (!prefersReducedMotion) {
+                    startParticleAnimation();
+                }
+            }, 2200);
+        });
+
+        // ===== PARTICLE SYSTEM =====
+        function resizeCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.size = Math.max(0.5, Math.random() * 3);
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.isHeart = Math.random() > 0.85;
+                this.hue = Math.random() > 0.5 ? 35 : 350;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > particleCanvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > particleCanvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                
+                if (this.isHeart) {
+                    this.drawHeart();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, Math.max(0.1, this.size), 0, Math.PI * 2);
+                    ctx.fillStyle = this.hue === 35 ? '#d4a95a' : '#8b3d4f';
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+
+            drawHeart() {
+                const size = Math.max(1, this.size * 3);
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.scale(size / 10, size / 10);
+                ctx.beginPath();
+                ctx.moveTo(0, -3);
+                ctx.bezierCurveTo(-5, -8, -10, -3, -10, 2);
+                ctx.bezierCurveTo(-10, 8, 0, 12, 0, 16);
+                ctx.bezierCurveTo(0, 12, 10, 8, 10, 2);
+                ctx.bezierCurveTo(10, -3, 5, -8, 0, -3);
+                ctx.fillStyle = '#8b3d4f';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(80, Math.floor(window.innerWidth / 20));
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            animationId = requestAnimationFrame(animateParticles);
+        }
+
+        function startParticleAnimation() {
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+
+        // ===== SCROLL ANIMATIONS =====
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        chapters.forEach(chapter => observer.observe(chapter));
+        timelineItems.forEach(item => observer.observe(item));
+        promiseCards.forEach((card, i) => {
+            card.style.transitionDelay = `${i * 0.1}s`;
+            observer.observe(card);
+        });
+
+        // ===== PROGRESS RING =====
+        function updateProgressRing() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = scrollTop / docHeight;
+            const circumference = 138.23;
+            const offset = circumference - (progress * circumference);
+            
+            progressCircle.style.strokeDashoffset = Math.max(0, offset);
+            
+            if (scrollTop > 100) {
+                progressRing.classList.add('visible');
+            } else {
+                progressRing.classList.remove('visible');
+            }
+        }
+
+        window.addEventListener('scroll', updateProgressRing);
+
+        // ===== COUNTER ANIMATION =====
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter-number[data-target]');
+            counters.forEach(counter => {
+                const target = parseInt(counter.dataset.target);
+                if (isNaN(target)) return;
+                
+                let current = 0;
+                const increment = target / 60;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 25);
+            });
+        }
+
+        const counterSection = document.querySelector('.counter-section');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        if (counterSection) {
+            counterObserver.observe(counterSection);
+        }
+
+        // ===== MUSIC PLAYER =====
+        function toggleMusic() {
+            if (isPlaying) {
+                bgMusic.pause();
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                if (visualizerInterval) {
+                    clearInterval(visualizerInterval);
+                    visualizerInterval = null;
+                }
+            } else {
+                bgMusic.play().catch(() => {
+                    console.log('Audio play requires user interaction');
+                });
+                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                if (!prefersReducedMotion) {
+                    animateVisualizer();
+                }
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function animateVisualizer() {
+            const bars = visualizer.querySelectorAll('.visualizer-bar');
+            visualizerInterval = setInterval(() => {
+                bars.forEach(bar => {
+                    const height = Math.max(5, Math.random() * 30);
+                    bar.style.height = height + 'px';
+                });
+            }, 100);
+        }
+
+        playBtn.addEventListener('click', toggleMusic);
+
+        // ===== MOUSE PARALLAX =====
+        if (!prefersReducedMotion) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                const x = (mouseX / window.innerWidth - 0.5) * 30;
+                const y = (mouseY / window.innerHeight - 0.5) * 30;
+
+                if (orb1) orb1.style.transform = `translate(${x * 0.5}px, ${y * 0.5}px)`;
+                if (orb2) orb2.style.transform = `translate(${-x * 0.3}px, ${y * 0.3}px)`;
+                if (orb3) orb3.style.transform = `translate(${x * 0.2}px, ${-y * 0.2}px)`;
+            });
+        }
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
